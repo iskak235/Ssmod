@@ -1,0 +1,208 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}SSMOD | Байланыш{% endblock %}
+
+{% block content %}
+<style>
+    .contact-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 60px;
+        align-items: center;
+        min-height: 70vh;
+    }
+
+    .contact-content h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2.5rem, 8vw, 4rem);
+        margin-bottom: 10px;
+        letter-spacing: -2px;
+        padding-top: 50px;
+    }
+
+    .contact-content p {
+        font-size: 1.1rem;
+        opacity: 0.6;
+        margin-bottom: 50px;
+    }
+
+    /* СОЦИАЛДЫК ТАРМАКТАР */
+    .social-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .social-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 22px 30px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 100px;
+        text-decoration: none;
+        color: inherit;
+        transition: 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+    }
+
+    .social-card:hover {
+        background: #fff;
+        color: #000;
+        transform: scale(1.02);
+    }
+
+    .brand-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .brand-info img {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+    }
+
+    .brand-name {
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+
+    .arrow-icon { font-size: 1.2rem; opacity: 0.5; }
+
+    /* КАРТА */
+    .map-box {
+        position: relative;
+        height: 500px;
+        border-radius: 40px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .loc-tag {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        z-index: 10;
+        color: #fff;
+    }
+
+    @media (max-width: 900px) {
+        .contact-grid { grid-template-columns: 1fr; text-align: center; }
+        .contact-content h1 { font-size: 3rem; }
+        .social-card { padding: 18px 25px; }
+        .map-box { height: 350px; margin-top: 30px; }
+    }
+</style>
+
+<div class="contact-wrapper">
+    <div class="contact-grid">
+
+        <div class="contact-content" data-aos="fade-up">
+            <h1 data-lang-key="contact_title">Байланыш.</h1>
+            <p data-lang-key="contact_subtitle">Биз менен бир тийүү аркылуу байланышыңыз.</p>
+
+            <div class="social-stack">
+    <!-- WhatsApp -->
+    <a href="https://wa.me/996553956070" class="social-card" target="_blank" rel="noopener">
+        <div class="brand-info">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+            <span class="brand-name">WhatsApp</span>
+        </div>
+        <span class="arrow-icon">↗</span>
+    </a>
+
+    <!-- Instagram -->
+    <a href="https://www.instagram.com/vkus_schaste/" class="social-card" target="_blank" rel="noopener">
+        <div class="brand-info">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram">
+            <span class="brand-name">Instagram</span>
+        </div>
+        <span class="arrow-icon">↗</span>
+    </a>
+
+    <!-- Telegram -->
+<!-- Telegram -->
+<!-- Telegram (Бул версияда сүрөт коддун ичинде, ошондуктан сөзсүз чыгат) -->
+<a href="https://t.me/+996553956070" class="social-card" target="_blank" rel="noopener">
+    <div class="brand-info">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImEiIHgxPSIxMjAiIHgyPSIxMjAiIHkxPSIwIiB5Mj0iMjQwIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMzdhZWUxIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMTc1OWFjIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZmlsbD0idXJsKCNhKSIgZD0iTTI0MCAxMjBhMTIwIDEyMCAwIDAgMS0xMjAgMTIwQTEyMCAxMjAgMCAwIDEgMCAxMjBhMTIwIDEyMCAwIDAgMSAxMjAtMTIwQTEyMCAxMjAgMCAwIDEgMjQwIDEyMHoiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJNNTQuOTYgMTE3LjcyM2gxNDAuNTVsLTIzLjU2IDExMS4wNGMtMS43OCA4LjA4LTcuNTMgOS44OC0xNC4zIDYuMDhsLTM1LjY5LTI2LjMtMTcuMjYgMTYuNTRjLTIuMTUgMi4xNS0zLjYyIDMuNjItNy42NSAzLjYybDIuNDQtMzQuNjcgNjMuMTUtNTcuMDhjMi43NS0yLjQ0LS42LTMuODEtNC4yNy0xLjM3TDc5LjA1IDEzNS4xM2wtMzMuNTgtMTAuNWMtNy4zNS0yLjMtNy40OS03LjM1IDEuNTMtMTAuOTF6Ii8+PC9zdmc+" alt="Telegram">
+        <span class="brand-name">Telegram</span>
+    </div>
+    <span class="arrow-icon">↗</span>
+</a>
+</div>
+        </div>
+
+        <div class="map-box" data-aos="fade-up" data-aos-delay="200">
+            <div class="loc-tag">📍 <span data-lang-key="address_text">Бишкек ш., Атбашы көч., 6</span></div>
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d365.50146747585094!2d74.5772322582845!3d42.88506456012759!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x389ec81f95304193%3A0x6739832269a9e336!2z0YPQuy4g0JDRgtCx0LDRiNC40L3RgdC60LDRjSwgNiwg0JHQuNGI0LrQtdC6!5e0!3m2!1skg!2skg!4v1714755000000"
+                width="100%"
+                height="100%"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const contactTranslations = {
+        ky: {
+            contact_title: "Байланыш.",
+            contact_subtitle: "Биз менен бир тийүү аркылуу байланышыңыз.",
+            address_text: "Бишкек ш., Атбашы көч., 6"
+        },
+        ru: {
+            contact_title: "Контакты.",
+            contact_subtitle: "Свяжитесь с нами одним касанием.",
+            address_text: "г. Бишкек, ул. Атбашинская, 6"
+        },
+        en: {
+            contact_title: "Contact.",
+            contact_subtitle: "Connect with us in one touch.",
+            address_text: "6 Atbashinskaya St, Bishkek"
+        }
+    };
+
+    function updateContactLang() {
+        const lang = localStorage.getItem('selectedLanguage') || 'ky';
+        const t = contactTranslations[lang];
+
+        document.querySelectorAll('[data-lang-key]').forEach(el => {
+            const key = el.getAttribute('data-lang-key');
+            if (t && t[key]) {
+                el.textContent = t[key];
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', updateContactLang);
+    setInterval(updateContactLang, 1000);
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>AOS.init({ duration: 1000, once: true });</script>
+
+{% endblock %}

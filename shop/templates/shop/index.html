@@ -1,0 +1,291 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
+
+<style>
+    /* Стильдер өзгөрүүсүз калат */
+    :root {
+        --accent-rose: #ff4d6d;
+        --soft-gold: #d4af37;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+    }
+
+    .seo-hidden { display: none; }
+
+    .hero-section {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        background: radial-gradient(circle at top right, #fff5f7 0%, var(--bg) 60%);
+        padding: 40px 0;
+    }
+
+    .main-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 40px;
+        z-index: 10;
+        gap: 60px;
+    }
+
+    .hero-text { flex: 1.5; text-align: left; }
+
+    .premium-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 5px 12px;
+        background: rgba(255, 77, 109, 0.1);
+        border-radius: 50px;
+        color: var(--accent-rose);
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 77, 109, 0.15);
+    }
+
+    .hero-text h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2.2rem, 4vw, 3.8rem);
+        line-height: 1.2;
+        margin-bottom: 20px;
+        color: var(--text);
+    }
+
+    .hero-text h1 em { color: var(--accent-rose); font-style: italic; font-weight: 400; }
+
+    .hero-text p {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1rem;
+        line-height: 1.7;
+        opacity: 0.75;
+        max-width: 500px;
+        margin-bottom: 30px;
+        border-left: 2px solid var(--accent-rose);
+        padding-left: 15px;
+    }
+.order-btn-glass {
+    text-decoration: none;
+    padding: 16px 45px;
+    /* Назик тунук фон - караңгыда да, жарыкта да сонун көрүнөт */
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+
+    color: var(--text);
+    border-radius: 24px; /* Заманбап тегеректелген бурчтар */
+    font-weight: 600;
+    display: inline-block;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+
+    /* Көрүнөр-көрүнбөс назик чекеси */
+    border: 1px solid rgba(255, 255, 255, 0.25);
+
+    /* Көп катмарлуу жумшак көлөкө */
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.03),
+        inset 0 0 15px rgba(255, 255, 255, 0.08);
+
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 1px;
+
+    /* "Дем алган" назик анимация */
+    animation: luxuryGlow 4s infinite ease-in-out;
+}
+
+/* Баскычтын үстүнөн аккан жибектей жылтырак нур */
+.order-btn-glass::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.4),
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transition: 0.8s;
+}
+
+.order-btn-glass:hover::before {
+    left: 150%;
+}
+
+.order-btn-glass:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-6px) scale(1.04); /* Назик көтөрүлүү */
+    border-color: rgba(255, 77, 109, 0.6);
+    color: #ff4d6d; /* SSMOD негизги түсү */
+
+    /* Тийгенде пайда болгон жумшак нур */
+    box-shadow:
+        0 20px 40px rgba(255, 77, 109, 0.15),
+        0 0 15px rgba(255, 77, 109, 0.1);
+}
+
+/* Түн режими үчүн автоматтык назик жөндөө */
+[data-theme='dark'] .order-btn-glass {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
+}
+
+/* Өтө назик жана жай пульсация (Luxury Glow) */
+@keyframes luxuryGlow {
+    0% {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), inset 0 0 5px rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.25);
+    }
+    50% {
+        /* Ортосунда назик кызгылт нур чачат */
+        box-shadow: 0 10px 40px rgba(255, 77, 109, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 77, 109, 0.4);
+    }
+    100% {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), inset 0 0 5px rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.25);
+    }
+}
+    .video-wrapper { flex: 0.7; display: flex; justify-content: center; align-items: center; }
+
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 30px;
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.08);
+        transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .strawberry-video {
+        width: 280px;
+        height: auto;
+        border-radius: 22px;
+        display: block;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        object-fit: cover;
+    }
+
+    .video-loaded { opacity: 1; }
+
+    .blob {
+        position: absolute;
+        filter: blur(70px);
+        border-radius: 50%;
+        opacity: 0.08;
+        z-index: 1;
+    }
+
+    @media (max-width: 991px) {
+        .main-container { flex-direction: column; text-align: center; gap: 30px; }
+        .hero-text { order: 2; width: 100%; }
+        .video-wrapper { order: 1; width: 100%; }
+        .strawberry-video { width: 240px; }
+        .hero-text p { border-left: none; padding-left: 0; margin: 0 auto 30px; }
+    }
+</style>
+
+<!-- SEO үчүн жашыруун текст -->
+<div class="seo-hidden">
+    <h2>Клубника в шоколаде Ош жана Бишкек - Lux.kg</h2>
+    <p>Биз Ош жана Бишкек шаарларында эң даамдуу клубникаларды жеткиребиз.</p>
+</div>
+
+<section class="hero-section">
+    <div class="blob" style="width: 250px; height: 250px; background: var(--accent-rose); right: 10%; top: 15%;"></div>
+    <div class="blob" style="width: 180px; height: 180px; background: var(--soft-gold); left: 10%; bottom: 20%;"></div>
+
+    <div class="main-container">
+        <div class="hero-text" data-aos="fade-right" data-aos-duration="1200">
+            <div class="premium-badge">
+                <span>●</span> SSMOD Strawberry Art
+            </div>
+            <h1 data-lang-key="hero_title">Бельгия шоколады <br>менен <em>өзгөчө белек</em></h1>
+            <!-- Бул жерге шаарлар кошулду -->
+            <p data-lang-key="hero_desc">Биз ар бир кулпунайды сүйүү менен даярдайбыз. Жаңы мөмөлөр жана премиум шоколад — Ош жана Бишкек шаарларында сиздин жакындарыңыз үчүн эң сонун тандоо.</p>
+
+            <a href="{% url 'price' %}" class="order-btn-glass" data-lang-key="hero_btn">
+    Заказ берүү →
+</a>
+        </div>
+
+        <div class="video-wrapper" data-aos="fade-left" data-aos-delay="300">
+            <div class="glass-card">
+                <video class="strawberry-video" id="heroVideo" autoplay muted loop playsinline>
+    <source src="https://res.cloudinary.com/dffggv57z/video/upload/v1778862993/strawberry_360_rja1jm.mp4" type="video/mp4">
+</video>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+const homeTranslations = {
+    ky: {
+        hero_title: 'Бельгия шоколады <br>менен <em>өзгөчө белек</em>',
+        hero_desc: 'Биз ар бир кулпунайды сүйүү менен даярдайбыз. Жаңы мөмөлөр жана премиум шоколад — Ош жана Бишкек шаарларында сиздин жакындарыңыз үчүн эң сонун тандоо.',
+        hero_btn: 'Заказ берүү →'
+    },
+    ru: {
+        hero_title: 'Бельгийский шоколад <br>— <em>особенный подарок</em>',
+        hero_desc: 'Мы готовим каждую клубнику с любовью. Свежие ягоды и премиальный шоколад — идеальный выбор в Оше и Бишкеке для ваших близких.',
+        hero_btn: 'Заказать →'
+    },
+    en: {
+        hero_title: 'Belgian Chocolate <br>— <em>A Special Gift</em>',
+        hero_desc: 'We prepare every strawberry with love. Fresh berries and premium chocolate — the perfect choice in Osh and Bishkek for your loved ones.',
+        hero_btn: 'Order Now →'
+    }
+};
+
+function updateHomeLanguage() {
+    let lang = localStorage.getItem('selectedLanguage');
+    if (lang === 'eng') lang = 'en';
+    if (!lang) lang = 'ky';
+    const t = homeTranslations[lang];
+    if (t) {
+        document.querySelectorAll('[data-lang-key]').forEach(el => {
+            const key = el.getAttribute('data-lang-key');
+            if (t[key]) { el.innerHTML = t[key]; }
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateHomeLanguage();
+    AOS.init({ duration: 1000, once: true });
+    const video = document.getElementById('heroVideo');
+    if (video) {
+        video.addEventListener('loadeddata', function() { video.classList.add('video-loaded'); });
+        if (video.readyState >= 3) { video.classList.add('video-loaded'); }
+        video.play().catch(e => console.log("Video auto-play blocked"));
+    }
+});
+
+window.addEventListener('storage', updateHomeLanguage);
+window.addEventListener('languageChanged', updateHomeLanguage);
+setInterval(updateHomeLanguage, 1000);
+</script>
+{% endblock %}

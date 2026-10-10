@@ -1,0 +1,37 @@
+﻿# Негизги алкак жана сервер
+Django>=5.0,<6.0
+gunicorn
+uvicorn
+
+# База жана чөйрө
+psycopg2-binary
+dj-database-url
+python-dotenv
+
+# Статикалык файлдар жана сүрөттөр
+whitenoise
+Pillow
+
+# Cloudinary
+cloudinary
+django-cloudinary-storage
+
+# Формалар
+django-crispy-forms
+crispy-bootstrap5
+
+# API жана Google AI
+google-generativeai
+google-auth
+requests
+httpx
+
+# Көмөкчүлөр (версияларын алып салдык, pip өзү туурасын тандайт)
+sqlparse
+asgiref
+typing-extensions
+pydantic
+fuzzywuzzy
+python-Levenshtein
+
+

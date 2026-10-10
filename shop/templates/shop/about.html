@@ -1,0 +1,864 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Биз жөнүндө | SSMOD Strawberry Art{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+<style>
+    /* --- Негизги Стилдер --- */
+    .about-page {
+        overflow-x: hidden;
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: 'Montserrat', sans-serif;
+        line-height: 1.6;
+        /* Кошумча: Мазмун толук көрүнүшү үчүн */
+        display: block !important;
+        opacity: 1 !important;
+    }
+
+    /* AOS анимациясы кээде ноутбуктарда элементти жашырып койсо, аны ачуу */
+    [data-aos] {
+        opacity: 1 !important;
+        transform: none !important;
+        visibility: visible !important;
+    }
+
+    /* --- Hero Section --- */
+    .about-hero {
+        height: 55vh;
+        min-height: 450px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                    url('https://effect-buket.ru/wp-content/uploads/2023/05/photo1683915856.jpeg');
+        background-size: cover;
+        background-position: center;
+        color: white !important;
+        border-radius: 0 0 80px 80px;
+        position: relative;
+    }
+
+    .about-hero h1 {
+        font-family: 'Cinzel', serif;
+        font-size: clamp(2.5rem, 10vw, 5rem);
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        color: white;
+        margin: 0;
+    }
+
+    /* --- Мазмундук Бөлүм --- */
+    .story-section {
+        padding: 80px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .story-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 60px;
+        align-items: center;
+        margin-bottom: 100px;
+    }
+
+    .image-stack {
+        position: relative;
+        width: 100%;
+    }
+
+    .main-img {
+        width: 100%;
+        max-height: 600px;
+        object-fit: cover;
+        border-radius: 30px;
+        z-index: 2;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+        position: relative;
+        transition: transform 0.5s ease;
+        display: block;
+    }
+
+    .main-img:hover {
+        transform: scale(1.02);
+    }
+
+    .decoration-box {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 2px solid var(--accent);
+        top: -20px;
+        left: -20px;
+        border-radius: 30px;
+        z-index: 1;
+    }
+
+    /* --- ИНФО ПАНЕЛЬ --- */
+    .info-display-container {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: max-height 1s cubic-bezier(0.4, 0, 0.2, 1),
+                    opacity 0.8s ease,
+                    transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    margin 0.8s ease;
+        transform: translateY(-30px) scale(0.96);
+        filter: blur(15px);
+        margin-bottom: 0;
+        pointer-events: none;
+    }
+
+    .info-display-container.active {
+        max-height: 1000px;
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0) scale(1);
+        margin-bottom: 60px;
+        padding-top: 20px;
+        pointer-events: auto;
+    }
+
+    .glass-info-box {
+        background: rgba(15, 15, 15, 0.85);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 45px;
+        padding: 60px 40px;
+        text-align: center;
+        box-shadow: 0 40px 100px rgba(0,0,0,0.45);
+        position: relative;
+    }
+
+    #infoTitle, #infoText {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .info-display-container.active #infoTitle {
+        opacity: 1;
+        transform: translateY(0);
+        transition-delay: 0.4s;
+    }
+
+    .info-display-container.active #infoText {
+        opacity: 1;
+        transform: translateY(0);
+        transition-delay: 0.6s;
+    }
+
+    .glass-info-box h4 {
+        color: var(--accent);
+        font-family: 'Cinzel', serif;
+        font-size: 2rem;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+    }
+
+    .glass-info-box p {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.95);
+        max-width: 800px;
+        margin: 0 auto;
+        line-height: 2;
+    }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin: 40px 0 100px 0;
+    }
+
+    .stat-luxury-card {
+        background: var(--glass);
+        padding: 35px 15px;
+        text-align: center;
+        border-radius: 25px;
+        border: 1px solid var(--border);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-luxury-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--accent);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    .stat-luxury-card.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        transform: scale(0.92);
+    }
+
+    .stat-luxury-card.active h3,
+    .stat-luxury-card.active p {
+        color: white !important;
+    }
+
+    .stat-luxury-card h3 {
+        font-family: 'Cinzel', serif;
+        color: var(--accent);
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        transition: color 0.3s;
+    }
+/* --- АВТОРДУК КАРТА (Жалпы структура) --- */
+.author-card {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    align-items: center;
+    gap: 60px;
+    margin: 120px 0;
+    padding: 60px;
+    background: var(--glass);
+    border-radius: 60px;
+    border: 1px solid var(--border);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.1);
+    overflow: visible;
+    position: relative;
+}
+
+.author-image-wrapper {
+    flex: 0 0 380px;
+    width: 380px;
+    position: relative;
+    z-index: 10;
+    cursor: pointer;
+    transition: transform 0.5s ease;
+}
+
+.author-swiper {
+    width: 100%;
+    height: 520px;
+    border-radius: 45px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* СҮРӨТТҮН ЖЭЭГИ: Бираз даанараак кубулма жануу */
+.author-image-wrapper.active .author-swiper {
+    transform: scale(0.98);
+    filter: brightness(1);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    animation: glassMultiColor 8s infinite alternate ease-in-out;
+}
+
+/* --- СОЦИАЛДЫК ИКОНКАЛАР: ЧАГЫЛЫШКАН АЙНЕК --- */
+.glass-social-bottom {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.5);
+    display: flex;
+    gap: 12px;
+    z-index: 50;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.author-image-wrapper.active .glass-social-bottom {
+    opacity: 1;
+    visibility: visible;
+    bottom: 60px;
+    transform: translateX(-50%) scale(1);
+}
+
+.glass-item {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.12); /* Бираз жарыгыраак */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    position: relative;
+    overflow: hidden; /* Чагылышуу үчүн маанилүү */
+    transition: all 0.4s ease;
+    animation: glassMultiColor 10s infinite alternate ease-in-out;
+}
+
+/* ЖУМШАК ЧАГЫЛЫШУУ (GLARE EFFECT) */
+.glass-item::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.15),
+        transparent
+    );
+    transform: rotate(45deg);
+    transition: 0.6s;
+}
+
+.glass-item:hover::before {
+    left: 100%; /* Ховерде чагылышуу өтүп кетет */
+}
+
+/* ХОВЕР: Чагылышууну күчөтүү */
+.glass-item:hover {
+    transform: translateY(-10px) scale(1.15);
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* --- ТҮСТӨРДҮН БИЛИНЭЭР-БИЛИНБЕС АЛМАШУУСУ --- */
+@keyframes glassMultiColor {
+
+    }
+    50% {
+        /* Кызгылт (Soft Pink) */
+        border-color: rgba(255, 105, 180, 0.5);
+        box-shadow: 0 0 25px rgba(255, 105, 180, 0.3);
+    }
+    100% {
+        /* Жумшак Сары (Champagne Gold) */
+        border-color: rgba(255, 215, 0, 0.4);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+    }
+}
+
+/* --- ТЕКСТТЕР (Жумшак Кызыл) --- */
+.founder-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    background: #e63946;
+    color: white;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.author-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    line-height: 1.8;
+    font-style: italic;
+    color: var(--text);
+    border-left: 4px solid #e63946;
+    padding-left: 25px;
+    margin: 30px 0;
+    opacity: 0.9;
+}
+
+.swipe-hint {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #e63946;
+    font-weight: 700;
+    margin-top: 20px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    animation: pulseHint 2s infinite;
+}
+
+@keyframes pulseHint {
+    0% { opacity: 0.3; transform: scale(0.96); }
+    50% { opacity: 0.8; transform: scale(1); }
+    100% { opacity: 0.3; transform: scale(0.96); }
+}
+
+@media (max-width: 991px) {
+    .author-card {
+        flex-direction: column;
+        padding: 40px 25px;
+        gap: 40px;
+    }
+    .author-image-wrapper {
+        width: 100%;
+        max-width: 320px;
+        flex: none;
+    }
+    .author-swiper {
+        height: 420px;
+    }
+}
+
+/* --- Философия --- */
+.philosophy-box {
+    background: var(--nav-bg);
+    border: 1px solid var(--border);
+    border-radius: 80px;
+    padding: 80px 40px;
+    text-align: center;
+    margin-bottom: 100px;
+}
+
+/* --- Адаптация --- */
+@media (max-width: 991px) {
+    .story-grid { grid-template-columns: 1fr; gap: 40px; }
+
+    .author-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 40px 20px;
+        gap: 30px;
+    }
+
+    .author-image-wrapper {
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 340px;
+    }
+
+    .author-swiper {
+        height: 450px;
+        transform: rotate(0);
+    }
+
+    .swipe-hint {
+        white-space: normal;
+        font-size: 0.75rem;
+    }
+
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+
+<div class="about-page">
+    <section class="about-hero" data-aos="fade-down">
+        <p style="letter-spacing: 5px; font-size: 0.8rem; margin-bottom: 15px; color: white;">EST. 2024 • OSH CITY</p>
+        <h1 data-aos="zoom-in" data-aos-delay="300" data-lang-key="about_hero_title">SSMOD Studio</h1>
+        <div style="width: 80px; height: 3px; background: var(--accent); margin-top: 15px;"></div>
+    </section>
+
+    <div class="story-section">
+        <div class="story-grid">
+            <div class="image-stack" data-aos="fade-right" data-aos-duration="1000">
+                <div class="decoration-box"></div>
+                <img src="https://static.insales-cdn.com/images/articles/1/1601/1795649/252544_0008_1633111942_6-mykaleidoscope-ru-p-klubnika-v-shokolade-na-stole-krasivo-foto-8.jpg" class="main-img" alt="Strawberry Art">
+            </div>
+            <div class="story-content" data-aos="fade-left" data-aos-duration="1000">
+                <h2 style="font-family: 'Playfair Display', serif; color: var(--accent); font-size: 2.5rem; margin-bottom: 20px;" data-lang-key="about_story_title">Даам Искусствосу</h2>
+                <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 15px;" data-lang-key="about_story_p1">
+                    <b>SSMOD</b> — бул эстетика менен кынтыксыз даамдын айкалышы. Биз үчүн ар бир мөмө — бул таза кенеп, ал эми премиум шоколад — аны жанданткан боёк.
+                </p>
+                <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 15px;" data-lang-key="about_story_p2">
+                    Биз жөн гана десерт эмес, сиздин эң кымбат сезимдериңизди шоколадга оролгон автордук шедеврлер аркылуу жеткиребиз.
+                </p>
+                <a href="{% url 'price' %}" style="display: inline-block; padding: 12px 30px; border: 2px solid var(--accent); color: var(--accent); text-decoration: none; font-weight: 700; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;" data-lang-key="about_btn">
+                 ШЕДЕВРЛЕРДИ КӨРҮҮ →
+                </a>
+            </div>
+        </div>
+
+        <div id="infoDisplay" class="info-display-container">
+            <div class="glass-info-box">
+                <h4 id="infoTitle">Тема</h4>
+                <p id="infoText">Маалымат бул жерде чыгат...</p>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-luxury-card" data-aos="fade-up" data-aos-delay="100" onclick="showInfo('fresh', this)">
+                <h3>Fresh</h3>
+                <p data-lang-key="about_stat_fresh">Мөмөлөр</p>
+            </div>
+            <div class="stat-luxury-card" data-aos="fade-up" data-aos-delay="200" onclick="showInfo('premium', this)">
+                <h3>Premium</h3>
+                <p data-lang-key="about_stat_premium">Шоколад</p>
+            </div>
+            <div class="stat-luxury-card" data-aos="fade-up" data-aos-delay="300" onclick="showInfo('handmade', this)">
+                <h3>Handmade</h3>
+                <p data-lang-key="about_stat_handmade">Дизайн</p>
+            </div>
+            <div class="stat-luxury-card" data-aos="fade-up" data-aos-delay="400" onclick="showInfo('luxury', this)">
+                <h3>Luxury</h3>
+                <p data-lang-key="about_stat_luxury">Таңгактоо</p>
+            </div>
+        </div>
+
+       <div class="author-card" data-aos="fade-up" data-aos-duration="1200" id="mainAuthorCard">
+    <div class="author-image-wrapper" id="authorWrapper">
+
+        <!-- 1-Автордун сүрөттөрү (Искак) -->
+        <div class="swiper author-swiper" id="swiper-iskak">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+    <img src="https://res.cloudinary.com/dffggv57z/image/upload/v1778873479/isi1_nlybzq.jpg" alt="Искак" style="width: 100%; max-width: 300px; border-radius: 8px;">
+</div>
+
+            </div>
+        </div>
+
+        <!-- 2-Автордун сүрөттөрү (Шумкарбек) -->
+        <div class="swiper author-swiper" id="swiper-shumkar" style="display: none;">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide"><img src="https://res.cloudinary.com/dffggv57z/image/upload/v1778877083/shumkar_nd6koe.jpg"
+         alt="Шумкар"
+         style="width: 100%; max-width: 300px; border-radius: 8px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Социалдык тармактардын шилтемелери (ID'лер кошулду) -->
+        <div class="glass-social-bottom" id="dynamicSocials">
+            <a href="#" class="glass-item" target="_blank" id="link-insta"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="glass-item" target="_blank" id="link-wa"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" class="glass-item" target="_blank" id="link-fb"><i class="fab fa-facebook-f"></i></a>
+        </div>
+        <div class="swipe-hint" data-lang-key="about_swipe_hint">← СҮЙРӨҢҮЗ ЖЕ БАСЫҢЫЗ →</div>
+    </div>
+
+    <div class="author-info">
+        <div class="founder-badge" data-lang-key="about_founder_badge">Негиздөөчү</div>
+        <h2 style="font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 2px; line-height: 1.2; margin-bottom: 25px;">
+            <span id="authorLastName" style="font-size: 0.75em; text-transform: uppercase; color: var(--text); opacity: 0.85;">Жолдубай уулу</span> <br>
+            <span id="authorFirstName" style="font-family: 'Playfair Display', serif; font-style: italic; color: var(--accent); font-size: 1.3em;">Искак</span>
+        </h2>
+        <div class="author-quote" id="authorQuote">
+            "Менин максатым — ар бир кардардын эң баалуу көз ирмемдеринде гармонияны тартуулоо."
+        </div>
+        <p id="authorDesc" style="opacity: 0.85; line-height: 1.9; font-size: 1.05rem;">
+            SSMOD Studio 2024-жылы негизделгенден бери, биз ар бир заказга автордук мамиле жасап келебиз.
+        </p>
+    </div>
+</div>
+
+        <div class="philosophy-box" data-aos="zoom-in-up">
+            <blockquote style="font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 5vw, 2.5rem); font-style: italic; margin: 0;" data-lang-key="about_final_quote">
+                "Биз десерт эмес, шоколадга оролгон назик сезимдерди жана бакыттын даамын сунуштайбыз."
+            </blockquote>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+    // --- 🌍 КОТОРМОЛОРДУН БАЗАСЫ ---
+    const aboutTranslations = {
+        ky: {
+            about_hero_title: "SSMOD Studio",
+            about_story_title: "Даам Искусствосу",
+            about_story_p1: "<b>SSMOD</b> — бул эстетика менен кынтыксыз даамдын айкалышы. Биз үчүн ар бир мөмө — бул таза кенеп, ал эми премиум шоколад — аны жанданткан боёк.",
+            about_story_p2: "Биз жөн гана десерт эмес, сиздин эң кымбат сезимдериңизди шоколадга оролгон автордук шедеврлер аркылуу жеткиребиз.",
+            about_btn: "ШЕДЕВРЛЕРДИ КӨРҮҮ →",
+            about_stat_fresh: "Мөмөлөр",
+            about_stat_premium: "Шоколад",
+            about_stat_handmade: "Дизайн",
+            about_stat_luxury: "Таңгактоо",
+            about_swipe_hint: "← СҮЙРӨҢҮЗ ЖЕ БАСЫҢЫЗ →",
+            about_founder_badge: "Негиздөөчү",
+            about_f_lastname: "Жолдубай уулу",
+            about_f_firstname: "Искак",
+            about_quote: '"Менин максатым — ар бир кардардын эң баалуу көз ирмемдеринде гармонияны тартуулоо."',
+            about_author_p: "SSMOD Studio 2024-жылы негизделгенден бери, биз ар бир заказга автордук мамиле жасап келебиз. Сезимдерди шоколад менен жеткирүү — биздин эң негизги миссиябыз.",
+            about_final_quote: '"Биз десерт эмес, шоколадга оролгон назик сезимдерди жана бакыттын даамын сунуштайбыз."',
+            fresh_title: "Fresh - Таза Мөмөлөр",
+            fresh_text: "Биз күн сайын эң таза, чоң жана ширелүү клубникаларды тандап алабыз. Ар бир мөмө сапаты боюнча катуу көзөмөлдөн өтөт.",
+            premium_title: "Premium - Белгия Шоколады",
+            premium_text: "Биз дүйнөгө белгилүү Callebaut белгиялык шоколадын колдонобуз. Бул шоколад өзүнүн назик даамы жана жибектей текстурасы менен өзгөчөлөнөт.",
+            handmade_title: "Handmade - Автордук Дизайн",
+            handmade_text: "Ар бир кутуча - бул колго жасалган искусство. Биздин мастерлер ар бир клубниканы өзгөчө кылдаттык жана сүйүү менен кооздошот.",
+            luxury_title: "Luxury - Премиум Таңгактоо",
+            luxury_text: "Сиздин белегиңиз сыртынан да, ичинен да идеалдуу болушу керек. Биздин таңгактар эстетикалык ырахат тартуулоо үчүн атайын дизайнда ишке ашкан."
+        },
+        ru: {
+            about_hero_title: "Студия SSMOD",
+            about_story_title: "Искусство Вкуса",
+            about_story_p1: "<b>SSMOD</b> — это слияние эстетики и безупречного вкуса. Для нас каждая ягода — это чистый холст, а премиальный шоколад — краски, оживляющие её.",
+            about_story_p2: "Мы создаем не просто десерты, мы передаем ваши самые сокровенные чувства через авторские шедевры в шоколаде.",
+            about_btn: "СМОТРЕТЬ ШЕДЕВРЫ →",
+            about_stat_fresh: "Ягоды",
+            about_stat_premium: "Шоколад",
+            about_stat_handmade: "Дизайн",
+            about_stat_luxury: "Упаковка",
+            about_swipe_hint: "← ЛИСТАЙТЕ ИЛИ НАЖМИТЕ →",
+            about_founder_badge: "Основатель",
+            about_f_lastname: "Жолдубай уулу",
+            about_f_firstname: "Искак",
+            about_quote: '"Моя цель — дарить гармонию в самые ценные моменты жизни каждого клиента."',
+            about_author_p: "С момента основания SSMOD Studio в 2024 году, мы подходим к каждому заказу авторски. Наша миссия — передавать чувства через шоколад.",
+            about_final_quote: '"Мы предлагаем не десерт, а нежные чувства и вкус счастья, облаченные в шоколад."',
+            fresh_title: "Fresh - Свежие Ягоды",
+            fresh_text: "Мы ежедневно отбираем самые свежие, крупные и сочные ягоды. Каждая клубника проходит строгий контроль качества.",
+            premium_title: "Premium - Бельгийский Шоколад",
+            premium_text: "Мы используем всемирно известный бельгийский шоколад Callebaut, отличающийся нежным вкусом и шелковистой текстурой.",
+            handmade_title: "Handmade - Авторский Дизайн",
+            handmade_text: "Каждая коробочка — это ручная работа. Наши мастера украшают каждую ягоду с особой тщательностью и любовью.",
+            luxury_title: "Luxury - Премиум Упаковка",
+            luxury_text: "Ваш подарок должен быть идеален как внутри, так и снаружи. Наша упаковка создана для эстетического удовольствия.",
+        },
+        en: {
+            about_hero_title: "SSMOD Studio",
+            about_story_title: "The Art of Taste",
+            about_story_p1: "<b>SSMOD</b> is a fusion of aesthetics and flawless taste. For us, every berry is a blank canvas, and premium chocolate is the paint that brings it to life.",
+            about_story_p2: "We don't just create desserts; we convey your most precious feelings through handcrafted masterpieces in chocolate.",
+            about_btn: "VIEW MASTERPIECES →",
+            about_stat_fresh: "Berries",
+            about_stat_premium: "Chocolate",
+            about_stat_handmade: "Design",
+            about_stat_luxury: "Packaging",
+            about_swipe_hint: "← SWIPE OR CLICK →",
+            about_founder_badge: "Founder",
+            about_f_lastname: "Zholdubai uulu",
+            about_f_firstname: "Iskak",
+            about_quote: '"My goal is to provide harmony during the most precious moments of every client\'s life."',
+            about_author_p: "Since the founding of SSMOD Studio in 2024, we have taken an artistic approach to every order. Delivering emotions through chocolate is our core mission.",
+            about_final_quote: '"We offer not a dessert, but delicate feelings and the taste of happiness wrapped in chocolate."',
+            fresh_title: "Fresh - Pure Berries",
+            fresh_text: "We select the freshest, largest, and juiciest strawberries daily. Every berry undergoes strict quality control.",
+            premium_title: "Premium - Belgian Chocolate",
+            premium_text: "We use the world-renowned Callebaut Belgian chocolate, known for its delicate flavor and silky texture.",
+            handmade_title: "Handmade - Signature Design",
+            handmade_text: "Every box is a handcrafted piece of art. Our masters decorate each strawberry with exceptional care and love.",
+            luxury_title: "Luxury - Premium Packaging",
+            luxury_text: "Your gift should be perfect both inside and out. Our packaging is specially designed for aesthetic pleasure.",
+        }
+    };
+
+    let activeType = null;
+
+    // --- Инфо-карточкаларды көрсөтүү функциясы ---
+    function showInfo(type, element) {
+        const lang = localStorage.getItem('selectedLanguage') || 'ky';
+        const display = document.getElementById('infoDisplay');
+        const titleEl = document.getElementById('infoTitle');
+        const textEl = document.getElementById('infoText');
+        const cards = document.querySelectorAll('.stat-luxury-card');
+
+        if (activeType === type) {
+            display.classList.remove('active');
+            element.classList.remove('active');
+            activeType = null;
+            return;
+        }
+
+        if (activeType !== null) {
+            display.classList.remove('active');
+            cards.forEach(c => c.classList.remove('active'));
+            setTimeout(() => updateAndOpen(), 400);
+        } else {
+            updateAndOpen();
+        }
+
+        function updateAndOpen() {
+            titleEl.innerText = aboutTranslations[lang][type + "_title"];
+            textEl.innerText = aboutTranslations[lang][type + "_text"];
+
+            display.classList.add('active');
+            element.classList.add('active');
+            activeType = type;
+
+            setTimeout(() => {
+                display.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+    }
+
+    // --- 🌍 ТИЛДИ ЖАҢЫРТУУ ФУНКЦИЯСЫ ---
+    function updateAboutLanguage() {
+        const lang = localStorage.getItem('selectedLanguage') || 'ky';
+
+        // 1. Статикалык тексттерди которуу
+        document.querySelectorAll('[data-lang-key]').forEach(el => {
+            const key = el.getAttribute('data-lang-key');
+            if (aboutTranslations[lang][key]) {
+                el.innerHTML = aboutTranslations[lang][key];
+            }
+        });
+
+        // 2. Эгер ачык турган инфо-карта болсо, аны да которуу
+        if (activeType) {
+            document.getElementById('infoTitle').innerText = aboutTranslations[lang][activeType + "_title"];
+            document.getElementById('infoText').innerText = aboutTranslations[lang][activeType + "_text"];
+        }
+    }
+
+    // 🔥 Тилди дароо алмаштыруу үчүн окуяларды байкоо
+    window.addEventListener('languageChanged', updateAboutLanguage);
+    setInterval(updateAboutLanguage, 500); // Кошумча текшерүү
+
+ document.addEventListener('DOMContentLoaded', function() {
+    const authors = [
+        {
+            firstName: "Искак",
+            lastName: "Жолдубай уулу",
+            quote: '"Менин максатым — ар бир кардардын эң баалуу көз ирмемдеринде гармонияны тартуулоо."',
+            desc: "SSMOD Studio 2024-жылы негизделгенден бери, биз ар бир заказга автордук мамиле жасап келебиз.",
+            swiperId: "swiper-iskak",
+            socials: {
+                insta: "https://www.instagram.com/i_235_k?igsh=MXFkN3BjMHRoMGR2eA==",
+                wa: "https://wa.me/996553956070",
+                fb: "https://www.facebook.com/share/18Yy1hB642/"
+            }
+        },
+        {
+            firstName: "Шумкарбек",
+            lastName: "Салиев",
+            quote: '"Биз үчүн сапат жана эстетика — бул жөн гана сөз эмес, бул жашоо образы."',
+            desc: "Биз ар бир деталга өзгөчө маани берип, кардарларыбызга премиум деңгээлдеги кызмат көрсөтүүнү улантабыз.",
+            swiperId: "swiper-shumkar",
+            socials: {
+                insta: "https://www.instagram.com/ssalievv.11?igsh=dDhyYXpkcnRmeWxn&utm_source=qr",
+                wa: "https://wa.me/996554146437",
+                fb: "https://www.facebook.com/shumkar_fb"
+            }
+        }
+    ];
+
+    let currentIndex = 0;
+    let isPaused = false;
+    let autoSwitchTimer;
+
+    // Слайдерлерди так өтүү үчүн конфигурациялоо (loop өчүрүлдү, свайп иштеши үчүн)
+    const swiperIskak = new Swiper('#swiper-iskak', { loop: false, grabCursor: true, speed: 600 });
+    const swiperShumkar = new Swiper('#swiper-shumkar', { loop: false, grabCursor: true, speed: 600 });
+
+    const wrapper = document.getElementById('authorWrapper');
+    const mainCard = document.getElementById('mainAuthorCard'); // Башкы карточкаңыздын ID дареги
+
+    function updateAuthor(index, duration = 600) {
+        if (currentIndex === index) return;
+
+        currentIndex = index;
+        const data = authors[index];
+
+        // Картага динамикалык өтүү убактысын берүү жана CSS классты кошуу
+        if (mainCard) {
+            mainCard.style.transition = `all ${duration / 1000}s cubic-bezier(0.25, 1, 0.5, 1)`;
+            mainCard.classList.add('switching');
+        }
+
+        setTimeout(() => {
+            // Тексттерди жаңылоо
+            document.getElementById('authorFirstName').innerText = data.firstName;
+            document.getElementById('authorLastName').innerText = data.lastName;
+            document.getElementById('authorQuote').innerText = data.quote;
+            document.getElementById('authorDesc').innerText = data.desc;
+
+            // Шилтемелерди жаңылоо
+            document.getElementById('link-insta').href = data.socials.insta;
+            document.getElementById('link-wa').href = data.socials.wa;
+            document.getElementById('link-fb').href = data.socials.fb;
+
+            // Слайдерлерди алмаштыруу
+            if (data.swiperId === "swiper-iskak") {
+                document.getElementById('swiper-iskak').style.display = 'block';
+                document.getElementById('swiper-shumkar').style.display = 'none';
+                swiperIskak.update();
+                swiperIskak.slideTo(0, 0);
+            } else {
+                document.getElementById('swiper-iskak').style.display = 'none';
+                document.getElementById('swiper-shumkar').style.display = 'block';
+                swiperShumkar.update();
+                swiperShumkar.slideTo(0, 0);
+            }
+
+            // Анимацияны бүтүрүү (Кайра жумшак пайда кылуу)
+            if (mainCard) {
+                mainCard.classList.remove('switching');
+            }
+        }, duration / 2);
+    }
+
+    // 5 секунддук автоматтык таймер функциясы
+    function startTimer() {
+        autoSwitchTimer = setInterval(() => {
+            if (!isPaused) {
+                let nextIndex = (currentIndex + 1) % authors.length;
+                updateAuthor(nextIndex, 800); // Автоматтык түрдө абдан жумшак өтөт
+            }
+        }, 5000);
+    }
+
+    // Баштапкы жүктөө
+    updateAuthor(0);
+    startTimer();
+
+    // Автоматтык алмашууну токтотуучу башкы функция
+    function stopAutoplay() {
+        isPaused = true;
+        clearInterval(autoSwitchTimer);
+    }
+
+    // КОЛ ТИЙГЕНДЕ (БАСКАНДА) ТОКТОТУУ ЛОГИКАСЫ
+    wrapper.addEventListener('click', function(e) {
+        stopAutoplay(); // Каалаган элементти басканда таймер биротоло токтойт
+
+        if (e.target.closest('.glass-item')) return; // Шилтеме болсо, өтүп кетсин
+        this.classList.toggle('active'); // Сүрөттү басса социалдык тармактарды ачат/жабат
+    });
+
+    // Манжанын ылдамдыгына жараша убакытты эсептөө коэффициенттери (Жеңил жана жумшак кылынды)
+    function getCustomDuration(diff, timeSpan) {
+        let speed = Math.abs(diff / timeSpan); // пиксель/миллисекунд
+        // Минималдуу убакыт 350мс (бат), максималдуу 850мс (жай) — бул убакыт көзгө абдан жагымдуу көрүнөт
+        return Math.max(350, Math.min(850, 600 / (speed + 0.2)));
+    }
+
+    // КОЛ МЕНЕН СҮРГӨНДӨ ТОКТОТУУ ЖАНА ДИНАМИКАЛЫК ӨТҮҮ
+
+    // 1. Искактан Шумкарбекке өтүү (Солго сүргөндө)
+    swiperIskak.on('touchEnd', function() {
+        stopAutoplay(); // Кол тийип сүрүлгөндө таймер токтойт
+        wrapper.classList.add('active'); // Байланыш баскычтарын ачык калтыруу
+
+        let touch = swiperIskak.touches;
+        let timeSpan = Date.now() - swiperIskak.touchEventsData.touchStartTime;
+        let diff = touch.diff;
+
+        // Сезимталдык -40тан -20го түшүрүлдү (кичине эле сүрсө дароо сезет)
+        if (swiperIskak.isEnd && diff < -20) {
+            let duration = getCustomDuration(diff, timeSpan);
+            updateAuthor(1, duration);
+        }
+    });
+
+    // 2. Шумкарбектен Искакка кайра өтүү (Оңго сүргөндө)
+    swiperShumkar.on('touchEnd', function() {
+        stopAutoplay(); // Кол тийип сүрүлгөндө таймер токтойт
+        wrapper.classList.add('active');
+
+        let touch = swiperShumkar.touches;
+        let timeSpan = Date.now() - swiperShumkar.touchEventsData.touchStartTime;
+        let diff = touch.diff;
+
+        // Сезимталдык 40тан 20га түшүрүлдү (жеңил өтөт)
+        if (swiperShumkar.isBeginning && diff > 20) {
+            let duration = getCustomDuration(diff, timeSpan);
+            updateAuthor(0, duration);
+        }
+    });
+});
+</script>
+{% endblock %}

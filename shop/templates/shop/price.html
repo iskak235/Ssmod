@@ -1,0 +1,1002 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+<style>
+    :root {
+        --royal-gold: #d4af37;
+        --gold-gradient: linear-gradient(135deg, #d4af37, #f1d37e, #d4af37);
+        --accent-green: #2ecc71;
+        --mbank-blue: #0067f4;
+        --glass-pink: rgba(255, 105, 180, 0.25);
+        --glass-gray: rgba(255, 255, 255, 0.1);
+        --glass-border: rgba(255, 255, 255, 0.2);
+        --standard-radius: 15px;
+    }
+
+    /* 🎨 НЕГИЗГИ ДИЗАЙН ЖАНА АНИМАЦИЯЛАР */
+    .royal-card {
+        position: relative;
+        height: 480px;
+        border-radius: var(--standard-radius);
+        overflow: hidden;
+        transition: 0.3s;
+        border: 1px solid var(--glass-border);
+        background: #1a1a1a;
+        cursor: pointer;
+        z-index: 1;
+    }
+
+    .royal-card::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        background: var(--gold-gradient);
+        z-index: -1;
+        opacity: 0.3;
+        border-radius: 17px;
+        animation: pulseGold 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGold {
+        0% { opacity: 0.2; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.01); }
+        100% { opacity: 0.2; transform: scale(1); }
+    }
+
+    .showcase-wrapper { max-width: 1400px; margin: auto; padding: 20px 15px; }
+    .showcase-header { text-align: center; margin-bottom: 30px; }
+    .showcase-header h1 {
+        font-family: 'Cinzel', serif;
+        font-size: clamp(1.5rem, 5vw, 2.5rem);
+        background: var(--gold-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+    }
+
+    .royal-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    @media (max-width: 992px) {
+        .royal-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+        .royal-grid { grid-template-columns: 1fr; gap: 20px; }
+        .royal-card { height: 450px; }
+        .lux-modal-content { width: 95%; padding: 15px; }
+        .card-overlay h3 { font-size: 1.1rem; margin: 2px 0; }
+        .royal-price { font-size: 1.3rem; margin-bottom: 8px; }
+        .royal-btn { padding: 10px 20px; font-size: 0.8rem; }
+        .like-btn { width: 40px; height: 40px; }
+    }
+
+    .card-overlay {
+        position: absolute;
+        inset: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: flex-start;
+        background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 40%, transparent 100%);
+        z-index: 2;
+        /* Бул жерде opacity: 0 жана transform өчүрүлдү, баасы дайыма көрүнүп турат */
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-overlay h3 {
+        font-family: 'Cinzel', serif;
+        font-size: 1.2rem;
+        color: #ffffff !important;
+        margin: 5px 0;
+        text-shadow: 2px 2px 5px rgba(0,0,0,0.9);
+    }
+
+    .royal-price {
+        font-size: 1.4rem;
+        color: var(--royal-gold) !important;
+        margin-bottom: 15px;
+        font-weight: 700;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+    }
+
+    /* ❤️ ЛАЙК СЕКЦИЯСЫ */
+    .like-container {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 11;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .like-btn {
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(5px);
+        border: 1px solid var(--glass-border);
+        color: #fff;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
+    }
+
+    .like-btn.active {
+        background: rgba(255, 71, 87, 0.2);
+        border-color: #ff4757;
+    }
+
+    .like-btn.active i {
+        color: #ff4757;
+        transform: scale(1.2);
+        text-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+    }
+
+    .like-count {
+        color: #ffffff !important;
+        font-weight: 700;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+        font-size: 0.9rem;
+        margin-top: 4px;
+        display: block;
+    }
+
+    .card-video-wrap { width: 100%; height: 100%; position: absolute; inset: 0; z-index: 1; }
+    .card-video-wrap video, .card-video-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+    .royal-btn {
+        background: var(--glass-pink);
+        backdrop-filter: blur(10px);
+        color: #fff;
+        padding: 10px 25px;
+        border-radius: 50px;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        transition: 0.3s;
+        box-shadow: 0 4px 15px rgba(255, 105, 180, 0.2);
+    }
+
+    /* 📦 МОДАЛДЫК ТЕРЕЗЕ ЖАНА ФОРМА */
+    .lux-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
+        backdrop-filter: blur(10px);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+    }
+
+    .lux-modal-content {
+        width: 100%;
+        max-width: 400px;
+        padding: 25px;
+        border-radius: 20px;
+        background: rgba(30, 30, 30, 0.95);
+        backdrop-filter: blur(20px);
+        color: #fff;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .close-x { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; border:none; background:none; color: #aaa; }
+
+    .input-group { margin-bottom: 18px; }
+    .input-group label { display: block; font-size: 0.8rem; margin-bottom: 6px; font-weight: 700; color: var(--royal-gold); }
+    .input-group input,
+    .input-group textarea,
+    .input-group select {
+        width: 100%;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        color: #fff;
+        outline: none;
+        transition: 0.3s;
+    }
+
+ /* 🌍 ӨЛКӨ ТАНДОО ҮЧҮН GLASS STYLE */
+.country-selector {
+    width: 110px !important;
+    font-size: 0.85rem;
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 12px;
+    cursor: pointer;
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+/* select option dark көрүнүш */
+.country-selector option {
+    background: #1a1a1a;
+    color: #fff;
+}
+/* ⏰ ТЕЗ ЖЕТКИРҮҮ SELECT GLASS */
+#deliveryTime {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+}
+
+#deliveryTime option {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+    /* 🔘 ТӨГӨРӨК ТӨМӨН ТИПТЕГИ БАСКЫЧТАР */
+    .sliding-toggle {
+        display: flex;
+        background: #0f0f0f;
+        border-radius: 12px;
+        position: relative;
+        margin-bottom: 20px;
+        padding: 4px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .toggle-slider {
+        position: absolute;
+        height: calc(100% - 8px);
+        width: calc(50% - 4px);
+        background: var(--accent-green);
+        border-radius: 10px;
+        transition: 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        z-index: 1;
+    }
+
+    .toggle-opt {
+        flex: 1;
+        text-align: center;
+        padding: 12px;
+        cursor: pointer;
+        position: relative;
+        z-index: 2;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #fff;
+        transition: 0.3s;
+    }
+
+    /* 🏦 МБАНК ЖАНА QR */
+    .qr-container {
+        display: none;
+        text-align: center;
+        margin: 15px 0;
+        padding: 20px;
+        background: #1a1a1a;
+        border: 2px solid var(--mbank-blue);
+        border-radius: 20px;
+    }
+
+    .qr-container img { width: 100%; max-width: 250px; border-radius: 10px; }
+
+    .copy-btn {
+        margin-top: 10px;
+        background: var(--mbank-blue);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        font-weight: 700;
+        transition: 0.2s;
+        width: 100%;
+    }
+
+    /* 💰 КОРУТУНДУ ЖАНА ЖӨНӨТҮҮ */
+    .summary-box {
+        background: rgba(255,255,255,0.05);
+        padding: 20px;
+        border-radius: 15px;
+        margin: 25px 0;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sum-row { display: flex; justify-content: space-between; align-items: center; }
+    .final-total { font-size: 1.4rem; color: var(--accent-green); font-weight: 800; }
+    .delivery-note { font-size: 0.85rem; color: #ff6b6b; margin-top: 5px; display: block; font-weight: 700; }
+
+    .send-btn {
+        width: 100%;
+        margin-top: 10px;
+        padding: 18px;
+        border-radius: 15px;
+        border: none;
+        background: var(--gold-gradient);
+        color: #000;
+        font-weight: 800;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 1rem;
+        transition: 0.3s;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    }
+
+    /* 🎁 БЕЛЕК ТАНДОО */
+    .gift-option {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 105, 180, 0.1);
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px dashed var(--glass-pink);
+        cursor: pointer;
+    }
+
+    .gift-option input { width: 18px; height: 18px; cursor: pointer; accent-color: #ff69b4; }
+
+    /* Корзина баскычынын стили */
+.add-to-cart-btn {
+    background: #2ecc71 !important;
+    color: white !important;
+    border: 2px solid rgba(255,255,255,0.3) !important;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+    transition: all 0.3s;
+}
+
+.add-to-cart-btn:hover {
+    background: #27ae60 !important;
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
+}
+
+.add-to-cart-btn:active {
+    transform: scale(0.95);
+}
+  .cart-btn {
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+/* Иконка */
+.cart-icon {
+    font-size: 1.5rem;
+}
+
+/* Hover эффект */
+.cart-btn:hover {
+    transform: scale(1.15);
+    background: rgba(255,255,255,0.2);
+}
+
+/* Баскандагы эффект */
+.cart-btn:active {
+    transform: scale(0.95);
+}
+</style>
+
+<div class="showcase-wrapper">
+    <div class="showcase-header">
+        <h1 data-lang-key="menu_title">Биздин Меню</h1>
+    </div>
+    <div class="category-filter-container">
+        <button class="filter-btn active" data-filter="all" data-lang-key="all">Баары</button>
+        <button class="filter-btn" data-filter="strawberry" data-lang-key="strawberry">Кулпунайлар</button>
+        <button class="filter-btn" data-filter="flowers" data-lang-key="flowers">Гүлдөр</button>
+        <button class="filter-btn" data-filter="bears" data-lang-key="bears">Мишкалар</button>
+    </div>
+</div>
+    <div class="royal-grid">
+        {% for set in sets %}
+       <div class="royal-card {% if set.category.slug %}{{ set.category.slug }}{% endif %}" data-id="{{ set.id }}" data-title="{{ set.title }}" data-price="{{ set.price }}">
+            <div class="like-container">
+                <button class="like-btn {% if set.id in liked_sets %}active{% endif %}"
+                        id="like-btn-{{ set.id }}"
+                        onclick="toggleLike(this, event, {{ set.id }})">
+                    <i class="fas fa-heart"></i>
+                </button>
+                <span class="like-count" id="like-count-{{ set.id }}">{{ set.likes }}</span>
+            </div>
+            <div class="card-video-wrap">
+                {% if set.video %}
+                    <video autoplay muted loop playsinline><source src="{{ set.video.url }}" type="video/mp4"></video>
+                {% else %}
+                    <img src="{{ set.image.url }}" alt="{{ set.title }}">
+                {% endif %}
+            </div>
+            <div class="card-overlay">
+    <span style="color:var(--royal-gold); font-weight:700;">{{ set.pieces }} <span data-lang-key="pcs">шт</span></span>
+    <h3>{{ set.title }}</h3>
+    <div class="royal-price">{{ set.price }} <span data-lang-key="som">сом</span></div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; width: 45%; margin-top: 10px;">
+        <!-- Брондоо баскычы -->
+        <button onclick="openBooking(this, event)"
+                class="royal-btn"
+                data-lang-key="book_btn"
+                style="flex: 1; padding: 12px 20px;">
+            Брондоо
+        </button>
+
+        <!-- Корзина баскычы (сүрөттөгүдөй жашыл айлана) -->
+        <button onclick="addToCart(event, this)"
+        class="cart-btn"
+        data-id="{{ set.id }}"
+        data-title="{{ set.title }}"
+        data-price="{{ set.price }}">
+    <span class="cart-icon">🛒</span>
+</button>
+    </div>
+</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="bookingModal" class="lux-modal">
+    <div class="lux-modal-content">
+        <button class="close-x" onclick="closeModal()">✕</button>
+        <h3 id="modalTitle" style="text-align:center; font-family:'Cinzel'; margin-bottom:25px; color: var(--royal-gold);">Заказ</h3>
+
+        <div class="input-group">
+            <label data-lang-key="name_label"><i class="fas fa-user"></i> Атыңыз</label>
+            <input type="text" id="userName" data-lang-key="name_placeholder">
+        </div>
+
+        <div class="input-group">
+            <label data-lang-key="phone_label"><i class="fas fa-phone"></i> Телефон номериңиз</label>
+            <div class="phone-input-container">
+                <select id="countrySelect" class="country-selector" onchange="changeCountry()">
+                    <option value="+996">🇰🇬 +996</option>
+                    <option value="+7">🇷🇺 +7 (RU)</option>
+                    <option value="+7">🇰🇿 +7 (KZ)</option>
+                    <option value="+998">🇺🇿 +998</option>
+                    <option value="+992">🇹🇯 +992</option>
+                    <option value="+90">🇹🇷 +90</option>
+                    <option value="+971">🇦🇪 +971</option>
+                </select>
+                <input type="tel" id="userPhone" value="+996" maxlength="16">
+            </div>
+        </div>
+
+        <div class="sliding-toggle">
+            <div id="typeSlider" class="toggle-slider" style="left: 4px;"></div>
+            <div class="toggle-opt" id="optDelivery" onclick="switchDelivery(true)" data-lang-key="delivery_opt">Доставка</div>
+            <div class="toggle-opt" id="optSelf" onclick="switchDelivery(false)" data-lang-key="self_opt">Самовывоз</div>
+        </div>
+
+        <div class="input-group" id="addressGroup">
+            <label id="extraLabel" data-lang-key="address_label">📍 Дарегиңиз</label>
+            <input type="text" id="extraInput" data-lang-key="address_placeholder">
+        </div>
+
+     <div class="input-group">
+    <label>
+        <i class="fas fa-clock"></i>
+        <span data-lang-key="time_select_label">Качан жеткиребиз?</span>
+    </label>
+
+    <select id="deliveryTime">
+        <option value="Тезирээк" data-lang-key="time_asap">Тезирээк</option>
+        <option value="8:00 - 10:00">8:00 - 10:00</option>
+        <option value="10:00 - 12:00">10:00 - 12:00</option>
+        <option value="12:00 - 14:00">12:00 - 14:00</option>
+        <option value="14:00 - 16:00">14:00 - 16:00</option>
+        <option value="16:00 - 18:00">16:00 - 18:00</option>
+        <option value="18:00 - 20:00">18:00 - 20:00</option>
+        <option value="20:00 - 22:00">20:00 - 22:00</option>
+        <option value="22:00 - 24:00">22:00 - 24:00</option>
+    </select>
+</div>
+
+<label class="gift-option">
+    <input type="checkbox" id="isGift">
+    <span data-lang-key="gift_label">🎁 Бул белек (Анонимдүү)</span>
+</label>
+
+        <div class="input-group">
+            <label data-lang-key="note_label"><i class="fas fa-comment-dots"></i> Кошумча маалымат</label>
+            <textarea id="userNote" rows="2" data-lang-key="note_placeholder"></textarea>
+        </div>
+
+        <div class="sliding-toggle">
+            <div id="paySlider" class="toggle-slider" style="left: 4px;"></div>
+            <div class="toggle-opt" id="payCash" onclick="switchPayment('cash')" data-lang-key="cash_opt">Наличка</div>
+            <div class="toggle-opt" id="payMbank" onclick="switchPayment('mbank')" data-lang-key="mbank_opt">МБанк</div>
+        </div>
+
+        <div id="qrArea" class="qr-container">
+            <div style="color:var(--mbank-blue); font-weight:800; font-size:1rem; margin-bottom:15px; text-transform: uppercase;">
+                <i class="fas fa-university"></i> MBANK Төлөм
+            </div>
+            <div style="position: relative; display: inline-block; background: #fff; padding: 10px; border-radius: 10px;">
+    <img src="https://res.cloudinary.com/dffggv57z/image/upload/v1778863659/qr_gophap.jpg" alt="MBANK QR" style="width: 150px; height: auto;">
+
+    <div style="color: #000; font-size: 0.8rem; margin-top: 8px; font-weight: 700;">
+        Актилек.Ч
+    </div>
+</div>
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border: 1px dashed var(--mbank-blue);">
+                    <span id="copyNum" style="font-size: 1.3rem; font-weight: 800; color: #fff;">0553956070</span><br>
+                    <button class="copy-btn" type="button" onclick="copyNumber()" data-lang-key="copy_btn">
+                        <i class="fas fa-copy"></i> Көчүрүү
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-box">
+            <div class="sum-row">
+                <span style="opacity:0.8; font-weight: 600;" data-lang-key="total_label">Жалпы сумма:</span>
+                <div id="finalTotal" class="final-total">0 сом</div>
+            </div>
+            <span id="deliveryInfo" class="delivery-note" data-lang-key="delivery_note">+150 сом жеткирүү акысы кошулду</span>
+        </div>
+
+        <button onclick="sendOrder()" id="mainSendBtn" class="send-btn" data-lang-key="send_btn">ОТПРАВИТЬ ЗАКАЗ</button>
+    </div>
+</div>
+
+<script>
+const menuTranslations = {
+   ky: {
+        all: "Баары", strawberry: "Кулпунайлар", flowers: "Гүлдөр", bears: "Мишкалар",
+        menu_title: "Биздин Меню", pcs: "шт", som: "сом", book_btn: "Брондоо",
+        name_label: "Атыңыз", name_placeholder: "Атыңызды жазыңыз",
+        phone_label: "Телефон номериңиз", delivery_opt: "Доставка", self_opt: "Өзүм келем",
+        address_label: "📍 Дарегиңиз", address_placeholder: "бишкек шаары, дарек...",
+        time_label: "📍 Саат канчада келесиз?", time_placeholder: "Мисалы: 18:00",
+
+        // ЖЕТИШПЕГЕН АЧКЫЧТАР (УШУЛАРДЫ КОШ):
+        time_select_label: "Качан жеткиребиз?",
+        time_asap: "Тезирээк",
+        gift_label: "🎁 Бул белек (Анонимдүү)",
+
+        note_label: "Кошумча маалымат", note_placeholder: "Куттуктоо ж.б.",
+        cash_opt: "Наличка", mbank_opt: "МБанк", copy_btn: "Көчүрүүнү басыңыз",
+        total_label: "Жалпы сумма:", delivery_note: "+150 сом жеткирүү акысы кошулду",
+        send_btn: "Заказды жөнөтүү", copy_alert: "Номер көчүрүлдү: ", error_fill: "Сураныч, маалыматты толук толтуруңуз!",
+        sending: "Жөнөтүлүүдө...", wa_mbank: "⚠️ *МБанк чекти азыр тиркейм!*",
+        gift_yes: "Ооба 🎁", gift_no: "Жок"
+    },
+   ru: {
+        all: "Все", strawberry: "Клубника", flowers: "Цветы", bears: "Мишки",
+        menu_title: "Наше Меню", pcs: "шт", som: "сом", book_btn: "Заказать",
+        name_label: "Ваше имя", name_placeholder: "Введите ваше имя",
+        phone_label: "Номер телефона", delivery_opt: "Доставка", self_opt: "Самовывоз",
+        address_label: "📍 Ваш адрес", address_placeholder: "Город бишкек, адрес...",
+        time_label: "📍 Во сколько придете?", time_placeholder: "Например: 18:00",
+
+        // НОВЫЕ КЛЮЧИ:
+        time_select_label: "Когда доставить?",
+        time_asap: "Как можно быстрее",
+        gift_label: "🎁 Это подарок (Анонимно)",
+
+        note_label: "Доп. информация", note_placeholder: "Текст поздравления...",
+        cash_opt: "Наличка", mbank_opt: "МБанк", copy_btn: "Нажмите для копирования",
+        total_label: "Итоговая сумма:", delivery_note: "+150 сом включено за доставку",
+        send_btn: "ОТПРАВИТЬ ЗАКАЗ", copy_alert: "Номер скопирован: ", error_fill: "Пожалуйста, заполни все данные!",
+        sending: "Отправка...", wa_mbank: "⚠️ *Чек МБанка прикреплю сейчас!*",
+        gift_yes: "Да 🎁", gift_no: "Нет"
+    },
+   en: {
+        all: "All", strawberry: "Strawberries", flowers: "Flowers", bears: "Bears",
+        menu_title: "Our Menu", pcs: "pcs", som: "som", book_btn: "Order Now",
+        name_label: "Your Name", name_placeholder: "Enter your name",
+        phone_label: "Phone Number", delivery_opt: "Delivery", self_opt: "Pickup",
+        address_label: "📍 Your Address", address_placeholder: "Bishkek city, address...",
+        time_label: "📍 What time will you arrive?", time_placeholder: "Example: 6:00 PM",
+
+        // NEW KEYS:
+        time_select_label: "When to deliver?",
+        time_asap: "As soon as possible",
+        gift_label: "🎁 It's a gift (Anonymous)",
+
+        note_label: "Additional info", note_placeholder: "Greetings text...",
+        cash_opt: "Cash", mbank_opt: "MBANK", copy_btn: "Click to copy",
+        total_label: "Total Amount:", delivery_note: "+150 som delivery fee added",
+        send_btn: "Send Order", copy_alert: "Number copied: ", error_fill: "Please fill in all information!",
+        sending: "Sending...", wa_mbank: "⚠️ *Will attach MBANK receipt now!*",
+        gift_yes: "Yes 🎁", gift_no: "No"
+    }
+};
+let currentSet = {};
+let isDelivery = true;
+
+
+
+
+let paymentMethod = 'cash';
+let lastLang = localStorage.getItem('selectedLanguage') || 'ky';
+
+const DELIVERY_FEE = 150;
+const WHATSAPP_PHONE = "996553956070";
+
+function updateMenuLanguage() {
+    const lang = localStorage.getItem('selectedLanguage') || 'ky';
+    const t = menuTranslations[lang];
+
+    document.querySelectorAll('[data-lang-key]').forEach(el => {
+        const key = el.getAttribute('data-lang-key');
+        if (!t[key]) return;
+
+        if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+            el.placeholder = t[key];
+        }
+        // Эгер элементтин ичинде иконка болсо, аны сактап, текстти гана алмаштырат
+        else if (el.querySelector('i')) {
+            const icon = el.querySelector('i').outerHTML;
+            el.innerHTML = `${icon} ${t[key]}`;
+        }
+        // Калган учурларда (span, option ж.б.) жөн эле текстти алмаштырат
+        else {
+            el.innerHTML = t[key];
+        }
+    });
+
+    if (document.getElementById('bookingModal')?.style.display === 'flex') {
+        switchDelivery(isDelivery);
+        switchPayment(paymentMethod);
+    }
+
+    updateTotal();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateMenuLanguage();
+    switchDelivery(true);
+    switchPayment('cash');
+
+    const phoneInput = document.getElementById('userPhone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function () {
+            if (!this.value.startsWith('+')) {
+                this.value = '+' + this.value.replace(/[^\d]/g, '');
+            }
+            if (this.value.length > 16) {
+                this.value = this.value.slice(0, 16);
+            }
+        });
+    }
+});
+
+window.addEventListener('languageChanged', updateMenuLanguage);
+
+// Тилди көзөмөлдөөчү таймер (бат алмашуу үчүн)
+setInterval(() => {
+    const currentLang = localStorage.getItem('selectedLanguage') || 'ky';
+    if (currentLang !== lastLang) {
+        lastLang = currentLang;
+        updateMenuLanguage();
+    }
+}, 100);
+
+function changeCountry() {
+    const code = document.getElementById('countrySelect').value;
+    document.getElementById('userPhone').value = code;
+}
+
+function copyNumber() {
+    const num = "0553956070";
+    const lang = localStorage.getItem('selectedLanguage') || 'ky';
+    navigator.clipboard.writeText(num).then(() => {
+        alert(menuTranslations[lang].copy_alert + num);
+    });
+}
+
+function openBooking(btn, event) {
+    if (event) event.stopPropagation();
+    const card = btn.closest('.royal-card');
+
+    currentSet = {
+        title: card.dataset.title,
+        price: parseInt(card.dataset.price)
+    };
+
+    document.getElementById('modalTitle').textContent = currentSet.title;
+    document.getElementById('bookingModal').style.display = 'flex';
+
+    updateMenuLanguage();
+    updateTotal();
+}
+
+function closeModal() {
+    document.getElementById('bookingModal').style.display = 'none';
+}
+
+function switchDelivery(val) {
+    isDelivery = val;
+    const lang = localStorage.getItem('selectedLanguage') || 'ky';
+    const t = menuTranslations[lang];
+
+    document.getElementById('typeSlider').style.left = val ? '4px' : 'calc(50% - 4px)';
+    document.getElementById('optDelivery').style.color = val ? '#fff' : '#aaa';
+    document.getElementById('optSelf').style.color = !val ? '#fff' : '#aaa';
+
+    document.getElementById('extraLabel').innerHTML = val
+        ? `<i class="fas fa-map-marker-alt"></i> ${t.address_label}`
+        : `<i class="fas fa-clock"></i> ${t.time_label}`;
+
+    document.getElementById('extraInput').placeholder = val
+        ? t.address_placeholder
+        : t.time_placeholder;
+
+    document.getElementById('deliveryInfo').style.display = val ? 'block' : 'none';
+
+    updateTotal();
+}
+
+function switchPayment(method) {
+    paymentMethod = method;
+
+    const paySlider = document.getElementById('paySlider');
+    const qrArea = document.getElementById('qrArea');
+
+    if (method === 'cash') {
+        paySlider.style.left = '4px';
+        paySlider.style.background = 'var(--accent-green)';
+        document.getElementById('payCash').style.color = '#fff';
+        document.getElementById('payMbank').style.color = '#aaa';
+        qrArea.style.display = 'none';
+    } else {
+        paySlider.style.left = 'calc(50% - 4px)';
+        paySlider.style.background = 'var(--mbank-blue)';
+        document.getElementById('payCash').style.color = '#aaa';
+        document.getElementById('payMbank').style.color = '#fff';
+        qrArea.style.display = 'block';
+    }
+}
+
+function updateTotal() {
+    if (!currentSet.price) return;
+
+    const lang = localStorage.getItem('selectedLanguage') || 'ky';
+    let total = currentSet.price + (isDelivery ? DELIVERY_FEE : 0);
+
+    document.getElementById('finalTotal').textContent =
+        total + ' ' + (menuTranslations[lang].som || 'сом');
+}
+
+async function sendOrder() {
+    const lang = localStorage.getItem('selectedLanguage') || 'ky';
+    const t = menuTranslations[lang];
+
+    // 1. Маалыматтарды модалдан чогултуу
+    const name = document.getElementById('userName').value.trim() || 'Көрсөтүлгөн эмес';
+    const phone = document.getElementById('userPhone').value.trim();
+    const address = document.getElementById('extraInput').value.trim() || 'Көрсөтүлгөн эмес';
+    const note = document.getElementById('userNote').value.trim() || 'Жок';
+    const dTime = document.getElementById('deliveryTime').value;
+    const isGiftStatus = document.getElementById('isGift').checked;
+
+    // Төлөм жана Жеткизүү тексттери
+    const paymentText = paymentMethod === 'cash' ? 'Наличка' : 'МБанк';
+    const deliveryTypeText = isDelivery ? 'Доставка' : 'Самовывоз';
+    const giftText = isGiftStatus ? 'Да 🎁' : 'Жок';
+
+    // Төлөм ыкмасына жараша эскертүү текстин даярдоо
+    // Эгер наличка болсо - текст бош болот, эгер МБанк болсо - эскертүү кошулат
+    const paymentWarning = paymentMethod === 'cash'
+        ? ""
+        : "\n⚠️ *МБанк чекти азыр тиркейм!*";
+
+    // Сумманы алуу
+    const total = document.getElementById('finalTotal').textContent;
+
+    // 2. Валидация
+    if (!name || phone.length < 9) {
+        alert(t.error_fill || "Сураныч, атыңызды жана номериңизди жазыңыз!");
+        return;
+    }
+
+    const btn = document.getElementById('mainSendBtn');
+    btn.disabled = true;
+
+    // 3. Базага сактоо (Django Fetch)
+    try {
+        await fetch('/submit-order/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                name: name,
+                phone: phone,
+                address: address,
+                product: currentSet.title,
+                total: total,
+                delivery_time: dTime,
+                is_gift: isGiftStatus ? 'Да' : 'Нет',
+                note: note,
+                payment_method: paymentMethod === 'cash' ? 'Наличка' : 'МБанк',
+                is_delivery: isDelivery
+            })
+        });
+    } catch (e) {
+        console.error("Database save failed");
+    }
+
+    // 4. 💎 WHATSAPP БИЛДИРҮҮСҮ
+    const message = `🍓 *ЖАҢЫ ЗАКАЗ (SSMOD)*
+━━━━━━━━━━━━━━━
+👤 *Аты:* ${name}
+📞 *Телефон:* ${phone}
+💐 *Топтом:* ${currentSet.title}
+💰 *Сумма:* ${total}
+📍 *Дарек/Түрү:* ${address} (${deliveryTypeText})
+⏰ *Убакыт:* ${dTime}
+🎁 *Белек:* ${giftText}
+💳 *Төлөм:* ${paymentText}
+📝 *Кошумча:* ${note}${paymentWarning}`;
+
+    // 5. WhatsApp-ка багыттоо
+    const myNumber = "996553956070";
+    const whatsappUrl = `https://wa.me/${myNumber}?text=${encodeURIComponent(message)}`;
+
+    setTimeout(() => {
+        btn.disabled = false;
+        window.open(whatsappUrl, '_blank');
+        closeModal();
+    }, 500);
+}
+
+async function toggleLike(btn, event, setId) {
+    event.stopPropagation();
+
+    const countElement = document.getElementById(`like-count-${setId}`);
+    let isActive = btn.classList.contains('active');
+    let currentCount = parseInt(countElement.textContent) || 0;
+
+    // Визуалдык дароо өзгөртүү
+    if (!isActive) {
+        countElement.textContent = currentCount + 1;
+        btn.classList.add('active');
+    } else {
+        countElement.textContent = Math.max(0, currentCount - 1);
+        btn.classList.remove('active');
+    }
+
+    try {
+        const response = await fetch(`/toggle-like/${setId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            countElement.textContent = data.total_likes;
+            btn.classList.toggle('active', data.is_liked);
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+window.onclick = e => {
+    if (e.target === document.getElementById('bookingModal')) {
+        closeModal();
+    }
+};
+    function addToCart(btn) {
+    const card = btn.closest('.royal-card');
+    const item = {
+        id: card.dataset.id,
+        title: card.dataset.title,
+        price: parseInt(card.dataset.price)
+    };
+
+    // Корзина массивине кошуу (мурунку код бар болсо)
+    if (!window.cart) window.cart = [];
+    if (window.cart.find(i => i.id === item.id)) {
+        alert("Бул товар мурунтан корзинада!");
+        return;
+    }
+    window.cart.push(item);
+
+    // Санды жаңыртуу (эгер икона бар болсо)
+    const countEl = document.getElementById('cartCount');
+    if (countEl) countEl.textContent = window.cart.length;
+
+    // Кыска анимация
+    btn.style.transform = "scale(1.4)";
+    setTimeout(() => btn.style.transform = "scale(1)", 200);
+}
+function addToCart(event, btn) {
+    event.stopPropagation(); // Картаны басканда модалдык терезе ачылып кетпеши үчүн
+
+    const productId = btn.dataset.id;
+
+    // Сиздин urls.py'деги 'cart_add' жолуна так дал келиши керек
+    fetch(`/cart/add/${productId}/`, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Товар кошулгандан кийин дароо корзина барагына багыттоо
+            window.location.href = "/cart/";
+        } else {
+            console.error("Серверден ката келди");
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+    // Саатты тандалган мааниден алабыз
+const dTime = document.getElementById('deliveryTime').value;
+
+// fetch'тин body бөлүгүндө ушундай болушу керек:
+body: JSON.stringify({
+    // ... башка маалыматтарыңыз ...
+    delivery_time: dTime, // МЫНА УШУЛ ЖЕРГЕ КОШУЛДУ
+})
+    document.addEventListener("DOMContentLoaded", function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const productCards = document.querySelectorAll('.royal-card');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            const filterValue = this.getAttribute('data-filter');
+
+            productCards.forEach(card => {
+                if (filterValue === 'all') {
+                    card.style.display = 'block';
+                } else if (card.classList.contains(filterValue)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
