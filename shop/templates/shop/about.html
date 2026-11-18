@@ -748,6 +748,9 @@
     const mainCard = document.getElementById('mainAuthorCard'); // Башкы карточкаңыздын ID дареги
 
     function updateAuthor(index, duration = 600) {
+        if (index !== 0) return;
+        
+
         if (currentIndex === index) return;
 
         currentIndex = index;
