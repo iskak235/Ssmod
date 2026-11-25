@@ -124,6 +124,9 @@ STORAGES = {
     },
 }
 
+# django-cloudinary-storage collectstatic учурунда чакырган эски атрибут менен шайкештик үчүн
+STATICFILES_STORAGE = STORAGES['staticfiles']['BACKEND']
+
 WHITENOISE_MIME_TYPES = {
     '.mp4': 'video/mp4',
     '.mov': 'video/quicktime',
