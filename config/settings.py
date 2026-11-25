@@ -127,6 +127,9 @@ STORAGES = {
 # django-cloudinary-storage collectstatic учурунда чакырган эски атрибут менен шайкештик үчүн
 STATICFILES_STORAGE = STORAGES['staticfiles']['BACKEND']
 
+# CSS ичинде табылбаган шилтемелерден улам collectstatic токтоп калбашы үчүн
+WHITENOISE_MANIFEST_STRICT = False
+
 WHITENOISE_MIME_TYPES = {
     '.mp4': 'video/mp4',
     '.mov': 'video/quicktime',
@@ -176,3 +179,4 @@ if not DEBUG:
     # HSTS: алгач аз убакытка, HTTPS туура иштегенин текшергенден кийин жогорулатыңыз
     SECURE_HSTS_SECONDS = 3600  # кийин 31536000 (1 жыл)
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    
