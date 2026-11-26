@@ -7,6 +7,9 @@ from django.conf import settings
 from .models import ProductSet, BackgroundMusic, Review
 from fuzzywuzzy import fuzz
 from django.contrib.auth.decorators import login_required
+import os
+from django.core.cache import cache
+from .ai_prompt import SYSTEM_PROMPT
 
 
 # ====================== ❤️ ЛАЙК СИСТЕМАСЫ (SESSION МЕНЕН) ======================
@@ -318,28 +321,30 @@ def delete_review(request, review_id):
 
 # ====================== 🤖 AI ЧАТ ======================
 
-def strawberry_chat_api(request):
-    user_query = request.GET.get('message') or request.POST.get('message', '')
-    user_query = user_query.lower().strip()
-
-    if not user_query:
-        return JsonResponse({'reply': "Салам! 🍓 Мен SSMOD жардамчысымын."})
-
+def _keyword_reply(user_query):
+    """Эски жөнөкөй чат: Claude иштебей калганда запас катары"""
     knowledge_base = {
-        "саламдашуу": {"keywords": ["салам", "привет", "hello", "саламатсызбы"],
-                       "reply": "Саламатсызбы! 😊 Сизге жардам керекпи?"},
-        "баалар": {"keywords": ["баа", "канча", "сом", "цена"], "reply": "Топтомдор 800 сомдон башталат. 💸"},
-        "жеткирүү": {"keywords": ["жеткирүү", "доставка", "курьер"],
-                     "reply": "Ош шаары ичинде жеткирүү бар. 🚚 Акысы 100-150 сом."},
-        "дарек": {"keywords": ["кайда", "адрес", "локация"],
-                  "reply": "Биз Ош шаарындабыз. 📍 Так дарек 'Байланыш' бөлүмүндө."}
+        "саламдашуу": {
+            "keywords": ["салам", "привет", "hello", "саламатсызбы"],
+            "reply": "Саламатсызбы! Сизге жардам керекпи?",
+        },
+        "баалар": {
+            "keywords": ["баа", "канча", "сом", "цена"],
+            "reply": "Топтомдор 800 сомдон башталат.",
+        },
+        "жеткирүү": {
+            "keywords": ["жеткирүү", "доставка", "курьер"],
+            "reply": "Ош шаары ичинде жеткирүү бар. Акысы 100-150 сом.",
+        },
+        "дарек": {
+            "keywords": ["кайда", "адрес", "локация"],
+            "reply": "Биз Ош шаарындабыз. Так дарек 'Байланыш' бөлүмүндө.",
+        },
     }
-
     for category in knowledge_base.values():
         for keyword in category["keywords"]:
             if keyword in user_query:
-                return JsonResponse({'reply': category["reply"]})
-
+                return category["reply"]
     best_match = None
     highest_score = 0
     for category in knowledge_base.values():
@@ -348,9 +353,48 @@ def strawberry_chat_api(request):
             if score > highest_score:
                 highest_score = score
                 best_match = category["reply"]
+    return best_match if highest_score > 65 else "Кечириңиз, түшүнбөй калдым. Операторго жазып көрүңүзчү."
 
-    reply = best_match if highest_score > 65 else "Кечириңиз, түшүнбөй калдым. Операторго жазып көрүңүзчү 😊"
-    return JsonResponse({'reply': reply})
+
+def _claude_reply(message, ip):
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        return None
+    key = f"ai_chat_{ip}"
+    count = cache.get(key, 0)
+    if count >= 30:
+        return None
+    cache.set(key, count + 1, 3600)
+    try:
+        r = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={
+                "x-api-key": api_key,
+                "anthropic-version": "2026-10-21",
+                "content-type": "application/json",
+            },
+            json={
+                "model": os.environ.get("CLAUDE_MODEL", "claude-haiku-5-5"),
+                "max_tokens": 500,
+                "system": SYSTEM_PROMPT,
+                "messages": [{"role": "user", "content": message}],
+            },
+            timeout=20,
+        )
+        r.raise_for_status()
+        return r.json()["content"][0]["text"]
+    except Exception as e:
+        print(f"Claude error: {e}")
+        return None
+
+
+def strawberry_chat_api(request):
+    message = (request.GET.get("message") or request.POST.get("message", "")).strip()[:500]
+    if not message:
+        return JsonResponse({"reply": "Салам! Мен SSMOD жардамчысымын."})
+    ip = request.META.get("HTTP_X_FORWARDED_FOR", request.META.get("REMOTE_ADDR", "")).split(",")[0].strip()
+    reply = _claude_reply(message, ip) or _keyword_reply(message.lower())
+    return JsonResponse({"reply": reply})
 
 
 # ====================== 📄 БАРАКЧАЛАР ======================
