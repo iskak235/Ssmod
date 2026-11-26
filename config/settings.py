@@ -6,30 +6,13 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- КООПСУЗДУК ---
-# Render'де DEBUG коюлбаса, автоматтык түрдө False болот.
-# Локалдык режим үчүн: DEBUG=True environment variable коюңуз.
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+# SECRET_KEY'ди ар дайым Environment Variables аркылуу алуу сунушталат
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-key-for-local-only')
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
-if not SECRET_KEY:
-    if DEBUG:
-        SECRET_KEY = 'django-insecure-local-only'
-    else:
-        raise ValueError('SECRET_KEY environment variable is not set')
+# Render'де дайыма False болушу керек. Локалдык режим үчүн Environment Variable колдонсоңуз болот.
+DEBUG = True
 
-ALLOWED_HOSTS = [
-    'lux.kg',
-    'www.lux.kg',
-    'ssmod-strawberry-1.onrender.com',
-]
-
-# Render'дин автоматтык берген хосту
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
-if DEBUG:
-    ALLOWED_HOSTS += ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 # --- ТИРКЕМЕЛЕР ---
 INSTALLED_APPS = [
@@ -82,14 +65,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# --- МААЛЫМАТ БАЗАСЫ ---
-# Серверде PostgreSQL (DATABASE_URL), локалдык режимде SQLite
+# --- МААЛЫМАТ БАЗАСЫ (DATABASE) ---
+# Локалдык режимде SQLite, серверде PostgreSQL колдонуу үчүн логика:
 if os.environ.get('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.config(
             conn_max_age=600,
             conn_health_checks=True,
-            ssl_require=True,
+            ssl_require=True
         )
     }
 else:
@@ -100,35 +83,33 @@ else:
         }
     }
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # --- ТИЛ ЖАНА УБАКЫТ ---
 LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'Asia/Bishkek'
 USE_I18N = True
 USE_TZ = True
 
-# --- СТАТИКАЛЫК ЖАНА МЕДИА ФАЙЛДАР ---
+# --- СТАТИКАЛЫК ФАЙЛДАР ---
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Whitenoise үчүн статикалык файлдарды кысуу
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Django 4.2+ үчүн (STATICFILES_STORAGE жана DEFAULT_FILE_STORAGE ордуна)
-STORAGES = {
-    'default': {
-        'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
-    },
-        'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
-    },
+# --- CLOUDINARY ЖӨНДӨӨЛӨРҮ ---
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'dtuyalp6m'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '636667862685854'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'PgRp9Z7dBhdkoVTk0K1sa1I1390'),
+    'SECURE': True,
 }
 
-# django-cloudinary-storage collectstatic учурунда чакырган эски атрибут менен шайкештик үчүн
-STATICFILES_STORAGE = STORAGES['staticfiles']['BACKEND']
-
-# CSS ичинде табылбаган шилтемелерден улам collectstatic токтоп калбашы үчүн
-WHITENOISE_MANIFEST_STRICT = False
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 WHITENOISE_MIME_TYPES = {
     '.mp4': 'video/mp4',
@@ -136,47 +117,26 @@ WHITENOISE_MIME_TYPES = {
     '.webm': 'video/webm',
 }
 
-# --- CLOUDINARY ---
-# Баары Render → Environment бөлүмүнөн берилет
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
-    'SECURE': True,
-}
-
 # --- TELEGRAM BOTS ---
-# Токендер кодго жазылбайт, Environment Variables аркылуу гана берилет
-ADMIN_BOT_TOKEN = os.environ.get('ADMIN_BOT_TOKEN', '')
-ADMIN_CHAT_ID = os.environ.get('ADMIN_CHAT_ID', '')
-DELIVERY_BOT_TOKEN = os.environ.get('DELIVERY_BOT_TOKEN', '')
-DELIVERY_CHAT_ID = os.environ.get('DELIVERY_CHAT_ID', '')
-SUPPORT_BOT_TOKEN = os.environ.get('SUPPORT_BOT_TOKEN', '')
-SUPPORT_CHAT_ID = os.environ.get('SUPPORT_CHAT_ID', '')
+ADMIN_BOT_TOKEN = os.environ.get('ADMIN_BOT_TOKEN', '8450866956:AAFYekwt1Sgcz606O46tB37mKAmI3Tsptd4')
+ADMIN_CHAT_ID = os.environ.get('ADMIN_CHAT_ID', '7678418524')
+DELIVERY_BOT_TOKEN = os.environ.get('DELIVERY_BOT_TOKEN', '8450866956:AAFYekwt1Sgcz606O46tB37mKAmI3Tsptd4')
+DELIVERY_CHAT_ID = os.environ.get('DELIVERY_CHAT_ID', '6365816184')
+SUPPORT_BOT_TOKEN = os.environ.get('SUPPORT_BOT_TOKEN', '8792681892:AAH1uuzIeyVmcyS6VXPCCSlDI4gY9u2fngU')
+SUPPORT_CHAT_ID = os.environ.get('SUPPORT_CHAT_ID', '6365816184')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'profile'
 LOGOUT_REDIRECT_URL = 'home'
 
-# --- CSRF ЖАНА HTTPS КООПСУЗДУГУ ---
+# --- CSRF КООПСУЗДУГУ ---
 CSRF_TRUSTED_ORIGINS = [
     'https://lux.kg',
     'https://www.lux.kg',
-    'https://ssmod-strawberry-1.onrender.com',
+    'https://ssmod-strawberry-1.onrender.com'
 ]
-if RENDER_EXTERNAL_HOSTNAME:
-    render_origin = f'https://{RENDER_EXTERNAL_HOSTNAME}'
-    if render_origin not in CSRF_TRUSTED_ORIGINS:
-        CSRF_TRUSTED_ORIGINS.append(render_origin)
-
-# Render прокси артында иштейт
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
 if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    # HSTS: алгач аз убакытка, HTTPS туура иштегенин текшергенден кийин жогорулатыңыз
-    SECURE_HSTS_SECONDS = 3600  # кийин 31536000 (1 жыл)
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    
