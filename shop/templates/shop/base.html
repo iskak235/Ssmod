@@ -786,6 +786,68 @@
     window.addEventListener('click', () => {
         if(headerLangList) headerLangList.style.display = 'none';
     });
+      /**
+     * 5. AI ЧАТТЫ ЖӨНӨТҮҮ
+     */
+    const chatInputEl = document.getElementById('chatInput');
+    const sendBtnEl = document.getElementById('sendBtn');
+    const chatMsgsEl = document.getElementById('chatMsgs');
+
+    function appendChatMsg(text, sender) {
+        if (!chatMsgsEl) return null;
+        const div = document.createElement('div');
+        div.className = `msg ${sender}`;
+        div.textContent = text;
+        chatMsgsEl.appendChild(div);
+        chatMsgsEl.scrollTop = chatMsgsEl.scrollHeight;
+        return div;
+    }
+
+    async function sendStrawberryChat() {
+        if (!chatInputEl || !sendBtnEl || !chatMsgsEl) return;
+        const text = chatInputEl.value.trim();
+        if (!text) return;
+
+        appendChatMsg(text, 'user');
+        chatInputEl.value = '';
+        chatInputEl.disabled = true;
+        sendBtnEl.disabled = true;
+
+        const loadingBubble = appendChatMsg('...', 'bot');
+
+        try {
+            const res = await fetch(`/strawberry-chat/?message=${encodeURIComponent(text)}`, {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const data = await res.json();
+            if (loadingBubble) {
+                loadingBubble.textContent = data.reply || 'Жооп алынган жок.';
+            }
+        } catch (err) {
+            console.error('Chat error:', err);
+            if (loadingBubble) {
+                loadingBubble.textContent = 'Байланышта ката кетти. Кайра аракет кылып көрүңүз.';
+            }
+        } finally {
+            chatInputEl.disabled = false;
+            sendBtnEl.disabled = false;
+            chatInputEl.focus();
+            if (chatMsgsEl) chatMsgsEl.scrollTop = chatMsgsEl.scrollHeight;
+        }
+    }
+
+    if (sendBtnEl) {
+        sendBtnEl.addEventListener('click', sendStrawberryChat);
+    }
+    if (chatInputEl) {
+        chatInputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendStrawberryChat();
+            }
+        });
+    }
 </script>
 </body>
 </html>
