@@ -9,8 +9,8 @@ django.setup()
 User = get_user_model()
 
 # Сиз сураган маалыматтар:
-username = 'iskak'
-password = '1234' # Коопсуздук үчүн кичине татаалдаштырдык (YourPassword коштук)
+username = 'Ssmod'
+password = 'neobychnyi' # Коопсуздук үчүн кичине татаалдаштырдык (YourPassword коштук)
 email = 'admin@lux.kg'
 
 if not User.objects.filter(username=username).exists():
